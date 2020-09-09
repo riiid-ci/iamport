@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<style type="text/css">
+input, button {
+    display:block; margin: 2 2 2 2;
+    width: 300px;
+    font-size: 1em;
+}
+
+#console {
+    max-height: 800px;
+    max-width:  800px;
+    font-family: monospace;
+    background: #333;
+    color: white;
+    overflow: scroll;
+    white-space: nowrap;
+    margin-top: 50px;
+    border: 1px solid white;
+}
+
+#console span {
+    display: inline-block;
+    overflow: scroll;
+    border: 1px solid black;
+}
+</style>
+</head>
+<body>
+<div id="payment">
+    <input type="text" id="imp-uid" placeholder="imp22035547" />
+    <input type="text" id="pg" placeholder="kakaopay" />
+    <input type="text" id="pay-method" placeholder="card" />
+    <input type="text" id="name" placeholder="test-payment" />
+    <input type="text" id="merchant-uid" placeholder="test-payment" />
+    <input type="text" id="amount" placeholder="1000" />
+    <input type="text" id="m-redirect-url" placeholder="/" />
+</div>
+<button id="submit">결제 요청</button>
+
+<div id="console"/>
+
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
+<script type="text/javascript">
+$(function() {
+    $("#merchant-uid").val("test-payment" + (new Date()|0));
+
+    function getValue(e) {
+        return $(e).val().length > 0 ?
+            $(e).val() : $(e).attr("placeholder");
+    }
+
+    var err = "<span style=\"color:red\">[ ERR] </span>";
+    var info = "<span style=\"color:cyan\">[INFO] </span>";
+
+    function log(lv, x) {
+        $("#console").append($("<span>" + (new Date().toLocaleTimeString()) + " | " + lv + x + "</span><br>"));
+    }
+
+    function success(res) {
+        log(info, JSON.stringify(res));
+        log(info, "imp_uid:" + res.imp_uid);
+        log(info, "merchant_uid:" + res.merchant_uid);
+    }
+
+    function fail(res) {
+        log(err, JSON.stringify(res));
+    }
+
+    $("#submit").click(function() {
+        IMP.init(getValue($("#imp-uid")));
+        var kwargs = {};
+        $("#payment").children().each(function(i, e) {
+            if (i == 0) return;
+            var arg = $(e).attr('id').replace("-", "_");
+            var val = getValue(e);
+            kwargs[arg] = val;
+        });
+        log(info, JSON.stringify(kwargs));
+        IMP.request_pay(kwargs, function(res) {
+            if (res.success) success(res);
+            else fail(res);
+        });
+        return false;
+    });
+});
+</script>
+</body>
+</html>

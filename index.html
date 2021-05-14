@@ -35,7 +35,10 @@ input, button {
     <input type="text" id="name" placeholder="test-payment" />
     <input type="text" id="merchant-uid" placeholder="test-payment" />
     <input type="text" id="amount" placeholder="1000" />
+    <input type="text" id="naver-use-cfm" placeholder="1000" />
     <input type="text" id="m-redirect-url" placeholder="/" />
+    <input type="text" id="naverUseCfm" placeholder="" />
+    <input type="text" id="naverPopupMode" placeholder="true" />
 </div>
 <button id="submit">결제 요청</button>
 
@@ -47,6 +50,7 @@ input, button {
 <script type="text/javascript">
 $(function() {
     $("#merchant-uid").val("test-payment" + (new Date()|0));
+    $("#naverUseCfm").val(new Date().toISOString().slice(0,10).replace(/-/g,""));
 
     function getValue(e) {
         return $(e).val().length > 0 ?
@@ -75,7 +79,7 @@ $(function() {
         var kwargs = {};
         $("#payment").children().each(function(i, e) {
             if (i == 0) return;
-            var arg = $(e).attr('id').replace("-", "_");
+            var arg = $(e).attr('id').replaceAll("-", "_");
             var val = getValue(e);
             kwargs[arg] = val;
         });
